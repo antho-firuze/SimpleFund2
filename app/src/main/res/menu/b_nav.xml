@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="BERANDA"/>
+
+    <item
+            android:id="@+id/nav_portfolio"
+            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:title="PORTFOLIO"/>
+
+    <item
+            android:id="@+id/nav_transaction"
+            android:icon="@drawable/ic_notifications_black_24dp"
+            android:title="TRANSAKSI"/>
+
+    <item
+            android:id="@+id/nav_faq"
+            android:icon="@drawable/ic_help_black_24dp"
+            android:title="FAQ"/>
+
+</menu>
