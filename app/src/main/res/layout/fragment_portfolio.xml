@@ -112,8 +112,15 @@
 
                 </LinearLayout>
 
-                <ImageView android:layout_width="match_parent" 
-                           android:layout_height="200dp"/>
+                <TextView android:background="@android:color/darker_gray"
+                          android:layout_width="match_parent"
+                          android:layout_height="1dp"/>
+
+                <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/pieChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        tools:layout_editor_absoluteY="18dp"/>
 
                 <TextView
                         android:background="@android:color/darker_gray"
@@ -125,7 +132,7 @@
                         android:layout_height="wrap_content"/>
 
                 <android.support.v7.widget.RecyclerView
-                        android:id="@+id/recycleView_MU"
+                        android:id="@+id/recycleView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
 

@@ -42,10 +42,9 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                <ImageView
-                        android:id="@+id/banner_slider1"
-                        android:layout_width="match_parent"
-                        android:layout_height="250dp"/>
+                <ss.com.bannerslider.Slider android:id="@+id/banner_slider1"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="250dp"></ss.com.bannerslider.Slider>
 
                 <android.support.v7.widget.RecyclerView
                         android:id="@+id/recycleView"
