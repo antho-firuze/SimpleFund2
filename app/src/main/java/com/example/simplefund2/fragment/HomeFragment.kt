@@ -2,40 +2,30 @@ package com.example.simplefund2.fragment
 
 import android.content.Context
 import android.content.Intent
-import android.nfc.Tag
 import android.os.Bundle
+import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.view.PagerAdapter
+import android.support.v7.app.ActionBar
+import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.Toast
-import com.example.simplefund2.ProductProfileActivity
+import com.example.simplefund2.*
 
-import com.example.simplefund2.R
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.list_marketupdate.view.*
 import kotlinx.android.synthetic.main.list_product.view.*
-import android.os.CountDownTimer
-import android.os.Debug
-import android.os.Handler
-import android.support.v4.os.HandlerCompat.postDelayed
-import android.util.Log
+import kotlinx.android.synthetic.main.activity_main.*
 import ss.com.bannerslider.ImageLoadingService
 import ss.com.bannerslider.Slider
 import ss.com.bannerslider.adapters.SliderAdapter
 import ss.com.bannerslider.viewholder.ImageSlideViewHolder
 import java.util.*
-import kotlin.concurrent.scheduleAtFixedRate
 
 
 class HomeFragment : Fragment() {
@@ -45,7 +35,6 @@ class HomeFragment : Fragment() {
 
     // LIST PRODUCT
     data class Product(val name: String, val navperunit: String, val r1d: String)
-
     fun getDataProduct(datas: ArrayList<Product>) {
         datas.add(Product("Avrist Dana Liquid", "1,234.75", "-1.23 %"))
         datas.add(Product("Avrist Dana LQ45", "1,234.75", "-1.50 %"))
@@ -54,14 +43,12 @@ class HomeFragment : Fragment() {
         datas.add(Product("view_more", "", ""))
         recycleView.adapter = ListAdapter_Product(products)
     }
-
     val products: ArrayList<Product> = ArrayList()
     lateinit var adapter_product: ListAdapter_Product
     lateinit var layoutManager_product: LinearLayoutManager
 
     // LIST MARKET UPDATE
     data class MarketUpdate(val title: String, val date: String, val img_url: String)
-
     fun getDataMarketUpdate(datas: ArrayList<MarketUpdate>) {
         datas.add(
             MarketUpdate(
@@ -93,10 +80,23 @@ class HomeFragment : Fragment() {
         )
         recycleView_MU.adapter = ListAdapter_MU(marketupdates)
     }
-
     val marketupdates: ArrayList<MarketUpdate> = ArrayList()
     lateinit var adapter_mu: ListAdapter_MU
     lateinit var layoutManager_mu: LinearLayoutManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.r_nav, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?) {
+        setMenuToolbar(menu)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_home, container, false)
@@ -104,6 +104,52 @@ class HomeFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        (activity as AppCompatActivity).supportActionBar?.title = ""
+
+        toolbar.setOnMenuItemClickListener {
+            Toast.makeText(context, it.title, Toast.LENGTH_LONG).show()
+
+            when (it.itemId) {
+                R.id.opt_login -> {
+                    val intent = Intent(context, LoginActivity::class.java)
+                    context?.startActivity(intent)
+                }
+                R.id.opt_logout -> {
+                    val builder =  AlertDialog.Builder((activity as AppCompatActivity))
+                    builder.setTitle("Info")
+                    builder.setMessage("Anda ingin keluar ?")
+                    builder.setPositiveButton("YES"){ dialog, which ->
+                        // Do something when user press the positive button
+                        Toast.makeText(context,"Ok, we logout.", Toast.LENGTH_SHORT).show()
+
+                        isLogin = false
+                        (activity as AppCompatActivity).invalidateOptionsMenu()
+
+                        (activity as AppCompatActivity).navigation.menu.findItem(R.id.nav_portfolio).isVisible = false
+                        (activity as AppCompatActivity).navigation.menu.findItem(R.id.nav_transaction).isVisible = false
+                    }
+                    builder.setNeutralButton("Cancel"){ dialog, which -> }
+                    val dialog: AlertDialog = builder.create()
+                    dialog.show()
+                }
+                R.id.opt_signup -> {
+                    val intent = Intent(context, RegisterActivity::class.java)
+                    context?.startActivity(intent)
+                }
+                R.id.opt_chgpwd -> {
+                    val intent = Intent(context, ChangePwdActivity::class.java)
+                    context?.startActivity(intent)
+                }
+                R.id.opt_profile -> {
+                    val intent = Intent(context, ProfileActivity::class.java)
+                    context?.startActivity(intent)
+                }
+            }
+
+            return@setOnMenuItemClickListener true
+        }
 
         Slider.init(PicassoImageLoadingService())
         banner_slider1.setAdapter(MainSliderAdapter())
@@ -129,6 +175,35 @@ class HomeFragment : Fragment() {
         layoutManager_mu = LinearLayoutManager(context)
         recycleView_MU.layoutManager = layoutManager_mu
         getDataMarketUpdate(marketupdates)
+
+        tv_viewMore.setOnClickListener {
+            val intent = Intent(it.context, MarketUpdateListActivity::class.java)
+            it.context.startActivity(intent)
+        }
+    }
+
+    fun setMenuToolbar(menu: Menu?) {
+        val opt_login = menu?.findItem(R.id.opt_login)
+        val opt_signup = menu?.findItem(R.id.opt_signup)
+        val opt_profile = menu?.findItem(R.id.opt_profile)
+        val opt_chgpwd = menu?.findItem(R.id.opt_chgpwd)
+        val opt_logout = menu?.findItem(R.id.opt_logout)
+
+        if (isLogin) {
+            opt_login!!.isVisible = false
+            opt_signup!!.isVisible = false
+            opt_profile!!.isVisible = true
+            opt_chgpwd!!.isVisible = true
+            opt_logout!!.isVisible = true
+        } else {
+            opt_login!!.isVisible = true
+            opt_signup!!.isVisible = true
+            opt_profile!!.isVisible = false
+            opt_chgpwd!!.isVisible = false
+            opt_logout!!.isVisible = false
+        }
+
+        (activity as AppCompatActivity).invalidateOptionsMenu()
     }
 
 //    fun autoSlider() {
@@ -243,7 +318,8 @@ class HomeFragment : Fragment() {
                 tv_name.setOnClickListener {
                     Toast.makeText(it.context, it.tv_name.text, Toast.LENGTH_LONG).show()
                     if (it.tv_name.text == "View More") {
-
+                        val intent = Intent(it.context, ProductListActivity::class.java)
+                        it.context.startActivity(intent)
                     } else {
                         val intent = Intent(it.context, ProductProfileActivity::class.java)
 //                    val intent = Intent(it.context, PerformanceChartActivity::class.java)
@@ -285,6 +361,13 @@ class HomeFragment : Fragment() {
                 tv_title.text = r.title
                 tv_date.text = r.date
                 Picasso.get().load(r.img_url).fit().into(img_market)
+
+                tv_title.setOnClickListener {
+                    val intent = Intent(it.context, MarketUpdateActivity::class.java)
+//                    val intent = Intent(it.context, PerformanceChartActivity::class.java)
+//                    intent.putExtra("img_url", BASE_URL_PORTFOLIO+"${row.PortfolioCode.toUpperCase()}.png")
+                    it.context.startActivity(intent)
+                }
             }
         }
 

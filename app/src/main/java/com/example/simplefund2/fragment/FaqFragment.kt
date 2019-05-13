@@ -108,8 +108,6 @@ class FaqFragment : Fragment() {
             }
             val title = convertView!!.findViewById<TextView>(R.id.tv_title)
             title.text = getGroup(groupPosition).toString()
-
-
             return convertView
         }
 

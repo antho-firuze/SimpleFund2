@@ -1,14 +1,19 @@
 package com.example.simplefund2
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.view.*
 import com.example.simplefund2.fragment.FaqFragment
 import com.example.simplefund2.fragment.HomeFragment
 import com.example.simplefund2.fragment.PortfolioFragment
 import com.example.simplefund2.fragment.TransactionFragment
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.listener.single.PermissionListener
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.jar.Manifest
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,12 +66,23 @@ class MainActivity : AppCompatActivity() {
             return@setOnNavigationItemSelectedListener true
         }
 
+        navigationMenuRefresh()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.r_nav, menu)
-        return true
+    override fun onResume() {
+        super.onResume()
+        navigationMenuRefresh()
     }
 
+    fun navigationMenuRefresh() {
+        var menu = navigation.menu
+        if (isLogin) {
+            menu.findItem(R.id.nav_portfolio).isVisible = true
+            menu.findItem(R.id.nav_transaction).isVisible = true
+        } else {
+            menu.findItem(R.id.nav_portfolio).isVisible = false
+            menu.findItem(R.id.nav_transaction).isVisible = false
+        }
+    }
 
 }

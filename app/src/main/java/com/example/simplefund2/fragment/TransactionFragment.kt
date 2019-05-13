@@ -1,15 +1,20 @@
 package com.example.simplefund2.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.example.simplefund2.R
+import com.example.simplefund2.TransactionProfileActivity
 import kotlinx.android.synthetic.main.fragment_transaction.*
 import kotlinx.android.synthetic.main.list_transaction.view.*
+import java.util.*
 
 class TransactionFragment : Fragment() {
 
@@ -145,6 +150,35 @@ class TransactionFragment : Fragment() {
                 tv_total.text = r.total
                 tv_unit.text = r.unit
                 tv_metode_pembayaran.text = r.metode_pemb
+
+                btn_cancel.setOnClickListener {
+                    val builder = AlertDialog.Builder(context)
+                    builder.setTitle("Info")
+                    builder.setMessage("Batalkan Transaksi ?")
+                    builder.setPositiveButton("YES") { dialog, which ->
+                        // Do something when user press the positive button
+                        Toast.makeText(context, "Transaksi dibatalkan", Toast.LENGTH_LONG).show()
+                    }
+                    builder.setNeutralButton("Cancel") { dialog, which -> }
+                    builder.create().show()
+                }
+
+                tv_name.setOnClickListener {
+                    val intent = Intent(it.context, TransactionProfileActivity::class.java)
+                    intent.putExtra("name", r.name)
+                    intent.putExtra("value_amount", r.value_amount)
+                    intent.putExtra("status", r.status)
+                    intent.putExtra("cost", r.cost)
+                    intent.putExtra("navperunit", r.navperunit)
+                    intent.putExtra("total", r.total)
+                    intent.putExtra("unit", r.unit)
+                    intent.putExtra("metode_pemb", r.metode_pemb)
+                    intent.putExtra("date", r.date)
+                    intent.putExtra("type", r.type)
+                    intent.putExtra("curr", r.curr)
+                    it.context.startActivity(intent)
+                }
+
             }
         }
 

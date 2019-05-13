@@ -1,13 +1,14 @@
 package com.example.simplefund2
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import com.example.simplefund2.fragment.ProductEfekFragment
-import com.example.simplefund2.fragment.ProductInfoFragment
-import com.example.simplefund2.fragment.ProductPerformanceFragment
+import com.example.simplefund2.product.ProductEfekFragment
+import com.example.simplefund2.product.ProductInfoFragment
+import com.example.simplefund2.product.ProductPerformanceFragment
 import kotlinx.android.synthetic.main.activity_product_profile.*
 
 class ProductProfileActivity : AppCompatActivity() {
@@ -16,8 +17,28 @@ class ProductProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_product_profile)
 
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = ""
+
         vp_main.adapter = MyPagerAdapter(supportFragmentManager)
         tabs_main.setupWithViewPager(vp_main)
+
+        btn_subscription.setOnClickListener {
+            val intent = Intent(it.context, SubscriptionActivity::class.java)
+            intent.putExtra("name", "Avrist Dana Liquid")
+            intent.putExtra("asset_type", "Pasar Uang")
+            intent.putExtra("risk_type", "Konservatif")
+            intent.putExtra("subs_min", 10000)
+            it.context.startActivity(intent)
+        }
+
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     fun getIncomingIntent() {
@@ -42,7 +63,11 @@ class ProductProfileActivity : AppCompatActivity() {
 
     class MyPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
-        val pages = listOf(ProductInfoFragment(), ProductPerformanceFragment(), ProductEfekFragment())
+        val pages = listOf(
+            ProductInfoFragment(),
+            ProductPerformanceFragment(),
+            ProductEfekFragment()
+        )
 
         override fun getItem(p0: Int): Fragment {
             return pages[p0]

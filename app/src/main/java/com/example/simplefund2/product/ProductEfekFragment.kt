@@ -1,4 +1,4 @@
-package com.example.simplefund2.fragment
+package com.example.simplefund2.product
 
 import android.os.Bundle
 import android.support.v4.app.Fragment

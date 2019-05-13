@@ -41,4 +41,7 @@ dependencies {
     implementation 'com.r0adkll:slidableactivity:2.0.6'
     implementation 'com.alespero:expandable-cardview:0.8'
     implementation 'me.relex:circleindicator:2.1.0'
+    implementation 'com.github.gcacace:signature-pad:1.2.1'
+//    implementation 'com.afollestad.material-dialogs:core:0.9.4.5'
+    implementation 'com.karumi:dexter:5.0.0'
 }

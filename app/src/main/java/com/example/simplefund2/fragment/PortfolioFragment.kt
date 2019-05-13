@@ -1,5 +1,6 @@
 package com.example.simplefund2.fragment
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -8,8 +9,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 
 import com.example.simplefund2.R
+import com.example.simplefund2.RedeemActivity
+import com.example.simplefund2.SubscriptionActivity
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieDataSet
 import kotlinx.android.synthetic.main.fragment_portfolio.*
@@ -32,14 +36,17 @@ class PortfolioFragment : Fragment() {
         val cost: String,
         val profitloss: String,
         val profitloss_percent: String,
-        val date: String
+        val date: String,
+        val asset_type: String,
+        val risk_type: String,
+        val subs_min: Number
     )
 
     fun getDataFund(datas: ArrayList<Fund>) {
-        datas.add(Fund("AVRIST ADA KAS MUTIARA", "68.03 %", "2,779,090.13", "1,079.80", "3,000,861,517.94", "3,000,000,000.00", "861,517.94", "0.03 %", "25-Jul-2018"))
-        datas.add(Fund("AVRIST DANA LQ45", "38.01 %", "2,779,090.13", "1,079.80", "3,000,861,517.94", "3,000,000,000.00", "861,517.94", "0.03 %", "25-Jul-2018"))
-        datas.add(Fund("AVRIST DANA LQ55", "65.05 %", "2,779,090.13", "1,079.80", "3,000,861,517.94", "3,000,000,000.00", "861,517.94", "0.03 %", "25-Jul-2018"))
-        datas.add(Fund("AVRIST DANA LQ65", "75.06 %", "2,779,090.13", "1,079.80", "3,000,861,517.94", "3,000,000,000.00", "861,517.94", "0.03 %", "25-Jul-2018"))
+        datas.add(Fund("AVRIST ADA KAS MUTIARA", "68.03 %", "2,779,090.13", "1,079.80", "3,000,861,517.94", "3,000,000,000.00", "861,517.94", "0.03 %", "25-Jul-2018", "Pasar Uang", "Konservatif", 10000))
+        datas.add(Fund("AVRIST DANA LQ45", "38.01 %", "2,779,090.13", "1,079.80", "3,000,861,517.94", "3,000,000,000.00", "861,517.94", "0.03 %", "25-Jul-2018", "Pasar Uang", "Konservatif", 10000))
+        datas.add(Fund("AVRIST DANA LQ55", "65.05 %", "2,779,090.13", "1,079.80", "3,000,861,517.94", "3,000,000,000.00", "861,517.94", "0.03 %", "25-Jul-2018", "Pasar Uang", "Konservatif", 10000))
+        datas.add(Fund("AVRIST DANA LQ65", "75.06 %", "2,779,090.13", "1,079.80", "3,000,861,517.94", "3,000,000,000.00", "861,517.94", "0.03 %", "25-Jul-2018", "Pasar Uang", "Konservatif", 10000))
         recycleView.adapter = ListAdapter_Fund(funds)
     }
 
@@ -60,6 +67,12 @@ class PortfolioFragment : Fragment() {
         layoutManager_fund = LinearLayoutManager(context)
         recycleView.layoutManager = layoutManager_fund
         getDataFund(funds)
+
+        val assetType = listOf("IDR", "USD")
+        val assetType_adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, assetType)
+        sp_curr.adapter = assetType_adapter
+
+
     }
 
     fun loadPieChart() {
@@ -108,6 +121,24 @@ class PortfolioFragment : Fragment() {
                 tv_profitloss.text = r.profitloss
                 tv_profitloss_percent.text = r.profitloss_percent
                 tv_date.text = r.date
+
+                btn_subscription.setOnClickListener {
+                    val intent = Intent(it.context, SubscriptionActivity::class.java)
+                    intent.putExtra("name", r.name)
+                    intent.putExtra("asset_type", r.asset_type)
+                    intent.putExtra("risk_type", r.risk_type)
+                    intent.putExtra("subs_min", r.subs_min)
+                    it.context.startActivity(intent)
+                }
+
+                btn_redeem.setOnClickListener {
+                    val intent = Intent(it.context, RedeemActivity::class.java)
+                    intent.putExtra("name", r.name)
+                    intent.putExtra("asset_type", r.asset_type)
+                    intent.putExtra("unit", r.unit)
+                    intent.putExtra("value_amount", r.value_amount)
+                    it.context.startActivity(intent)
+                }
             }
         }
 
