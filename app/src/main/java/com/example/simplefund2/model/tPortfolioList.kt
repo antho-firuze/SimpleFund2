@@ -13,9 +13,8 @@ import java.util.*
  * Created by antho.firuze@gmail.com on 14/05/2019.
  */
 
-open class tPorfolio : RealmObject() {
+open class tPorfolioList : RealmObject() {
     var PortfolioID: Int = 0
-    var PortfolioCode: String = ""
     var PortfolioNameShort: String = ""
     var Ccy: String = ""
     var AssetTypeCode: String = ""
@@ -24,41 +23,26 @@ open class tPorfolio : RealmObject() {
     var RiskTolerance: String = ""
     var RiskLevel: Int = 0
     var RiskScore: Int = 0
-    var InceptionDate: Date? = null
-    var CustodianBank: String = ""
-    var StatusCode: String = ""
-    var InvestmentObjective: String = ""
-    var MinimumInitialSubscription: String = ""
-    var MinimumAdditionalSubscription: String = ""
-    var MinimumRedemption: String = ""
-    var FeeCustodian: String = ""
-    var FeeSelling: String = ""
-    var FeeRedemption: String = ""
-    var FeeSwicthing: String = ""
-    var FeeManagement: String = ""
-    var apply_subscription: String = ""
-    var apply_redemption: String = ""
-    var apply_switching: String = ""
-    var apply_booking: String = ""
-    var start_booking: Date? = null
-    var MinimumSwitching: String = ""
+    var PositionDate: Date? = null
+    var NAVperUnit: Double = 0.00
+    var rYTD: Double = 0.00
 }
 
-class tPortfolioManager {
+class tPortfolioListManager {
     var realm: Realm = Realm.getDefaultInstance()
 
-    fun find(): tPorfolio? = realm.where<tPorfolio>().findFirst()
+    fun find(): tPorfolioList? = realm.where<tPorfolioList>().findFirst()
 
-    fun findAll(): List<tPorfolio> = realm.where<tPorfolio>().findAll()
+    fun findAll(): List<tPorfolioList> = realm.where<tPorfolioList>().findAll()
 
     fun insertFromJson(j: JSONObject) =
-        realm.executeTransaction { realm -> realm.createObjectFromJson(tPorfolio::class.java, j) }
+        realm.executeTransaction { realm -> realm.createObjectFromJson(tPorfolioList::class.java, j) }
 
     fun insertFromJsonList(j: JSONArray) {
         try {
             // Open a transaction to store items into the realm
             realm.beginTransaction()
-            realm.createAllFromJson(tPorfolio::class.java, j)
+            realm.createAllFromJson(tPorfolioList::class.java, j)
             realm.commitTransaction()
         } catch (e: IOException) {
             // Remember to cancel the transaction if anything goes wrong.
@@ -74,14 +58,14 @@ class tPortfolioManager {
     fun deleteAll() {
         try {
             realm.beginTransaction()
-            realm.delete<tPorfolio>()
+            realm.delete<tPorfolioList>()
             realm.commitTransaction()
         } finally {
             realm.close()
         }
 //        try {
 //            realm.executeTransaction { realm ->
-//                val results = realm.where(tPorfolio::class.java).findAll().deleteAllFromRealm()
+//                val results = realm.where(tPorfolioList::class.java).findAll().deleteAllFromRealm()
 //            }
 //        } finally {
 //            realm?.close()

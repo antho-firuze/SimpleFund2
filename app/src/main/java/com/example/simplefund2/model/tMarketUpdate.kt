@@ -2,6 +2,7 @@ package com.example.simplefund2.model
 
 import io.realm.Realm
 import io.realm.RealmObject
+import io.realm.kotlin.delete
 import io.realm.kotlin.where
 import org.json.JSONArray
 import org.json.JSONObject
@@ -14,10 +15,11 @@ import java.util.*
 
 open class tMarketUpdate : RealmObject() {
     var id: String = UUID.randomUUID().toString()
-    var mu_title: String = ""
-    var mu_date: Date? = null
-    var created_by: String = ""
-    var mu_body: String = ""
+    var ReviewID: Int = 0
+    var ReviewTitle: String = ""
+    var ReviewDate: String = ""
+    var ReviewBody: String = ""
+    var ReviewAuthor: String = ""
 }
 
 class tMarketUpdateManager {
@@ -25,12 +27,14 @@ class tMarketUpdateManager {
 
     fun find(): tMarketUpdate? = realm.where<tMarketUpdate>().findFirst()
 
-    fun findAll(): List<tMarketUpdate> = realm.where<tMarketUpdate>().findAll()
+    fun findAll(): List<tMarketUpdate> = realm.where<tMarketUpdate>().findAll()!!
 
     fun insertFromJson(j: JSONObject) =
         realm.executeTransaction { realm -> realm.createObjectFromJson(tMarketUpdate::class.java, j) }
 
     fun insertFromJsonList(j: JSONArray) {
+        tMarketUpdateManager().deleteAll()
+
         try {
             // Open a transaction to store items into the realm
             realm.beginTransaction()
@@ -49,11 +53,11 @@ class tMarketUpdateManager {
 
     fun deleteAll() {
         try {
-            realm.executeTransaction { realm ->
-                val results = realm.where(tMarketUpdate::class.java).findAll().deleteAllFromRealm()
-            }
+            realm.beginTransaction()
+            realm.delete<tMarketUpdate>()
+            realm.commitTransaction()
         } finally {
-            realm?.close()
+            realm.close()
         }
     }
 

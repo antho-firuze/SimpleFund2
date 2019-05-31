@@ -2,6 +2,7 @@ package com.example.simplefund2.model
 
 import io.realm.Realm
 import io.realm.RealmObject
+import io.realm.kotlin.delete
 import io.realm.kotlin.where
 import org.json.JSONArray
 import org.json.JSONObject
@@ -13,9 +14,12 @@ import java.util.*
  */
 
 open class tPorfolioDashboard : RealmObject() {
-    var id: Int = 0
-    var navperunit: Double = 0.0
-    var ytd: Double = 0.0
+    var PortfolioID: Int = 0
+    var PortfolioNameShort: String = ""
+    var Ccy: String = ""
+    var PositionDate: Date? = null
+    var NAVperUnit: Double = 0.0
+    var rYTD: Double = 0.0
 }
 
 class tPortfolioDashboardManager {
@@ -23,12 +27,14 @@ class tPortfolioDashboardManager {
 
     fun find(): tPorfolioDashboard? = realm.where<tPorfolioDashboard>().findFirst()
 
-    fun findAll(): List<tPorfolioDashboard> = realm.where<tPorfolioDashboard>().findAll()
+    fun findAll(): List<tPorfolioDashboard?> = realm.where<tPorfolioDashboard>().findAll()
 
     fun insertFromJson(j: JSONObject) =
         realm.executeTransaction { realm -> realm.createObjectFromJson(tPorfolioDashboard::class.java, j) }
 
     fun insertFromJsonList(j: JSONArray) {
+        tPortfolioDashboardManager().deleteAll()
+
         try {
             // Open a transaction to store items into the realm
             realm.beginTransaction()
@@ -47,11 +53,11 @@ class tPortfolioDashboardManager {
 
     fun deleteAll() {
         try {
-            realm.executeTransaction { realm ->
-                val results = realm.where(tPorfolioDashboard::class.java).findAll().deleteAllFromRealm()
-            }
+            realm.beginTransaction()
+            realm.delete<tPorfolioDashboard>()
+            realm.commitTransaction()
         } finally {
-            realm?.close()
+            realm.close()
         }
     }
 

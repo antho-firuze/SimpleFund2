@@ -10,10 +10,15 @@ import com.example.simplefund2.fragment.FaqFragment
 import com.example.simplefund2.fragment.HomeFragment
 import com.example.simplefund2.fragment.PortfolioFragment
 import com.example.simplefund2.fragment.TransactionFragment
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.single.PermissionListener
+import com.example.simplefund2.model.tMarketUpdate
+import com.example.simplefund2.model.tMarketUpdateManager
+import com.example.simplefund2.model.tPortfolioDashboardManager
+import com.example.simplefund2.model.tPortfolioManager
+import com.github.kittinunf.fuel.android.extension.responseJson
+import com.github.kittinunf.fuel.httpPost
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.jar.Manifest
+import org.jetbrains.anko.design.snackbar
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
 
@@ -67,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         navigationMenuRefresh()
+
     }
 
     override fun onResume() {

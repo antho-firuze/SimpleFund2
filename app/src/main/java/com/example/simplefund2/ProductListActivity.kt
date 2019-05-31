@@ -16,24 +16,31 @@ import android.widget.LinearLayout
 import android.widget.ListAdapter
 import android.widget.Toast
 import com.example.simplefund2.R
+import com.example.simplefund2.model.tPorfolio
+import com.example.simplefund2.model.tPorfolioList
+import com.example.simplefund2.model.tPortfolioListManager
+import com.github.kittinunf.fuel.android.extension.responseJson
+import com.github.kittinunf.fuel.httpPost
+import io.realm.Realm
+import io.realm.kotlin.where
 import kotlinx.android.synthetic.main.activity_product_list.*
 import kotlinx.android.synthetic.main.list_product2.view.*
+import org.json.JSONObject
 import java.util.ArrayList
 
 class ProductListActivity : AppCompatActivity() {
 
     // LIST PRODUCT
-    data class Product(val name: String, val navperunit: String, val r1d: String, val risk: String, val curr: String)
-    fun getDataProduct(datas: ArrayList<Product>) {
-        datas.add(Product("Avrist Dana Liquid", "1,234.75", "-1.23 %", "Konservatif", "IDR"))
-        datas.add(Product("Avrist Dana LQ45", "1,234.75", "-1.50 %", "Agresif", "IDR"))
-        datas.add(Product("Avrist Dana LQ55", "1,003.25", "-1.80 %", "Moderat", "IDR"))
-        datas.add(Product("Avrist Dana LQ65", "1,500.53", "1.5 %", "Agresif", "IDR"))
-        recycleView.adapter = ListAdapter_Product(products)
-    }
-    val products: ArrayList<Product> = ArrayList()
-    lateinit var adapter_product: ListAdapter_Product
-    lateinit var layoutManager_product: LinearLayoutManager
+//    data class Product(val name: String, val navperunit: String, val r1d: String, val risk: String, val curr: String)
+//    fun getDataProduct(datas: ArrayList<Product>) {
+//        datas.add(Product("Avrist Dana Liquid", "1,234.75", "-1.23 %", "Konservatif", "IDR"))
+//        datas.add(Product("Avrist Dana LQ45", "1,234.75", "-1.50 %", "Agresif", "IDR"))
+//        datas.add(Product("Avrist Dana LQ55", "1,003.25", "-1.80 %", "Moderat", "IDR"))
+//        datas.add(Product("Avrist Dana LQ65", "1,500.53", "1.5 %", "Agresif", "IDR"))
+//        recycleView.adapter = ListAdapter_Product(products)
+//    }
+//    val products: ArrayList<Product> = ArrayList()
+    val products: ArrayList<tPorfolioList> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,9 +63,15 @@ class ProductListActivity : AppCompatActivity() {
 //        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         sp_fund_type.adapter = fundType_adapter
 
-        layoutManager_product = LinearLayoutManager(this)
-        recycleView.layoutManager = layoutManager_product
-        getDataProduct(products)
+        recycleView.layoutManager = LinearLayoutManager(this)
+        var rows = Realm.getDefaultInstance().where<tPorfolioList>().findAll()
+        if (rows.isEmpty()) {
+            getPortfolioList()
+        } else {
+            products.addAll(Realm.getDefaultInstance().copyFromRealm(rows))
+            recycleView.adapter = ListAdapterProduct(products)
+        }
+//        getDataProduct(products)
 
     }
 
@@ -67,8 +80,29 @@ class ProductListActivity : AppCompatActivity() {
         return true
     }
 
-    class ListAdapter_Product(val rows: ArrayList<Product>) :
-        RecyclerView.Adapter<ListAdapter_Product.ListViewHolder>() {
+    fun getPortfolioList(){
+        req = setRequest("simple_fund.reksadana_daftar")
+        URL_API.httpPost().body(req).responseJson { _, resp, res ->
+            if (resp.data.size > 0) {
+                val (dataRes, _) = res
+                if (dataRes!!.obj().getBoolean("status")) {
+                    tPortfolioListManager().insertFromJsonList((dataRes.obj()["result"] as JSONObject).getJSONArray("rows"))
+
+                    var rows = Realm.getDefaultInstance().where<tPorfolioList>().findAll()
+                    products.addAll(Realm.getDefaultInstance().copyFromRealm(rows))
+                    recycleView.adapter = ListAdapterProduct(products)
+//                    snackbar(main_layout, "Loading data berhasil (master)")
+                } else {
+//                    snackbar(main_layout, "Error Load Data: "+dataRes.obj().getString("message"))
+                }
+            } else {
+//                snackbar(main_layout,"Error (Balance): Ajax request failed")
+            }
+        }
+    }
+
+    class ListAdapterProduct(val rows: ArrayList<tPorfolioList>) :
+        RecyclerView.Adapter<ListAdapterProduct.ListViewHolder>() {
         override fun onCreateViewHolder(p0: ViewGroup, p1: Int): ListViewHolder {
             return ListViewHolder(LayoutInflater.from(p0.context).inflate(R.layout.list_product2, p0, false))
         }
@@ -85,11 +119,11 @@ class ProductListActivity : AppCompatActivity() {
                     layout_main.background = ContextCompat.getDrawable(p0.itemView.context, R.color.PowderBlue)
                 }
 
-                tv_name.text = r.name
-                tv_risk.text = "(Resiko: ${r.risk})"
-                tv_curr.text = r.curr
-                tv_navperunit.text = r.navperunit
-                tv_r1d.text = "(+${r.r1d})"
+                tv_name.text = r.PortfolioNameShort
+                tv_risk.text = "(Resiko: ${r.RiskTolerance})"
+                tv_curr.text = r.Ccy
+                tv_navperunit.text = CurrFmt.format(r.NAVperUnit)
+                tv_r1d.text = "(${PercentFmt.format(r.rYTD)})"
 
                 tv_name.setOnClickListener {
                     Toast.makeText(it.context, it.tv_name.text, Toast.LENGTH_LONG).show()
