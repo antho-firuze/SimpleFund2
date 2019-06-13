@@ -13,9 +13,9 @@ import java.util.*
  */
 
 open class tTimestamp : RealmObject() {
-    var id: String = UUID.randomUUID().toString()
-    var timestamp: Date? = null
+//    var id: String = UUID.randomUUID().toString()
     var field: String = ""
+    var timestamp: Date? = null
 }
 
 class tTimestampManager {

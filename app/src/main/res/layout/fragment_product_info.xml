@@ -15,6 +15,7 @@
                   android:layout_height="wrap_content"/>
 
         <TextView
+                android:id="@+id/tv_inv_goal"
                 android:paddingBottom="8dp"
                 android:text="Avrist Balance - Cross Sectoral (ABCS) bertujuan untuk memberikan keseimbangan antara pertumbuhan nilai investasi dengan volatilitasnya, dengan berinvestasi pada efek bersifat ekuitas, efek surat utang, dan instrumen uang di Indonesia."
                 android:layout_width="match_parent"

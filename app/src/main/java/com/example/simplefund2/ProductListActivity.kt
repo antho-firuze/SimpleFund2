@@ -19,13 +19,16 @@ import com.example.simplefund2.R
 import com.example.simplefund2.model.tPorfolio
 import com.example.simplefund2.model.tPorfolioList
 import com.example.simplefund2.model.tPortfolioListManager
+import com.example.simplefund2.model.tTimestampManager
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpPost
+import com.google.gson.JsonObject
 import io.realm.Realm
 import io.realm.kotlin.where
 import kotlinx.android.synthetic.main.activity_product_list.*
 import kotlinx.android.synthetic.main.list_product2.view.*
 import org.json.JSONObject
+import java.text.SimpleDateFormat
 import java.util.ArrayList
 
 class ProductListActivity : AppCompatActivity() {
@@ -80,13 +83,17 @@ class ProductListActivity : AppCompatActivity() {
         return true
     }
 
-    fun getPortfolioList(){
+    fun getPortfolioList() {
         req = setRequest("simple_fund.reksadana_daftar")
         URL_API.httpPost().body(req).responseJson { _, resp, res ->
             if (resp.data.size > 0) {
                 val (dataRes, _) = res
                 if (dataRes!!.obj().getBoolean("status")) {
                     tPortfolioListManager().insertFromJsonList((dataRes.obj()["result"] as JSONObject).getJSONArray("rows"))
+
+                    var tt = JSONObject()
+                    tt.put("PortfolioList", SimpleDateFormat(ANSI_DATETIME_FORMAT))
+                    tTimestampManager().insertFromJson(tt)
 
                     var rows = Realm.getDefaultInstance().where<tPorfolioList>().findAll()
                     products.addAll(Realm.getDefaultInstance().copyFromRealm(rows))
@@ -114,7 +121,7 @@ class ProductListActivity : AppCompatActivity() {
         override fun onBindViewHolder(p0: ListViewHolder, p1: Int) {
             val r = rows[p1]
             p0.itemView.apply {
-                if (p1 % 2 == 0){
+                if (p1 % 2 == 0) {
 //                    layout_main.background = "@android:color/darker_gray"
                     layout_main.background = ContextCompat.getDrawable(p0.itemView.context, R.color.PowderBlue)
                 }
@@ -126,14 +133,26 @@ class ProductListActivity : AppCompatActivity() {
                 tv_r1d.text = "(${PercentFmt.format(r.rYTD)})"
 
                 tv_name.setOnClickListener {
-                    Toast.makeText(it.context, it.tv_name.text, Toast.LENGTH_LONG).show()
+                    pubVar = mapOf(
+                        "PortfolioID" to r.PortfolioID,
+                        "PortfolioName" to r.PortfolioNameShort,
+                        "AssetTypeDescription" to r.AssetTypeDescription,
+                        "RiskTolerance" to r.RiskTolerance,
+                        "NAVperUnit" to r.NAVperUnit
+                    )
+
+//                    Toast.makeText(it.context, it.tv_name.text, Toast.LENGTH_LONG).show()
                     val intent = Intent(it.context, ProductProfileActivity::class.java)
-//                    val intent = Intent(it.context, PerformanceChartActivity::class.java)
 //                    intent.putExtra("img_url", BASE_URL_PORTFOLIO+"${row.PortfolioCode.toUpperCase()}.png")
-//                    intent.putExtra("PortfolioID", row.PortfolioID)
-//                    intent.putExtra("PortfolioName", row.PortfolioNameFull.toUpperCase())
+//                    intent.putExtra("PortfolioID", r.PortfolioID)
+//                    intent.putExtra("PortfolioName", r.PortfolioNameShort.toUpperCase())
+//                    intent.putExtra("PortfolioName", r.PortfolioNameShort)
+//                    intent.putExtra("AssetTypeDescription", r.AssetTypeDescription)
+//                    intent.putExtra("RiskTolerance", r.RiskTolerance)
+//                    intent.putExtra("InvestmentObjective", r.InvestmentObjective)
+//                    intent.putExtra("CustodianBank", r.CustodianBank)
 //                    intent.putExtra("PositionDate", FormDateFmt.format(row.PositionDate))
-//                    intent.putExtra("NAVperUnit", CurrFmt.format(row.NAVperUnit))
+//                    intent.putExtra("NAVperUnit", CurrFmt.format(r.NAVperUnit))
 //                    intent.putExtra("r1D", PercentFmt.format(row.r1D).replace(" ", ""))
 //                    intent.putExtra("rMTD", PercentFmt.format(row.rMTD).replace(" ", ""))
 //                    intent.putExtra("rYTD", PercentFmt.format(row.rYTD).replace(" ", ""))
