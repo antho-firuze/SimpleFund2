@@ -186,7 +186,7 @@ class HomeFragment : Fragment() {
 
 
         recycleView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        var rows = Realm.getDefaultInstance().where<tPorfolioDashboard>().findAll()
+        var rows = realm?.where<tPorfolioDashboard>()?.findAll()
         products.addAll(Realm.getDefaultInstance().copyFromRealm(rows))
         recycleView.adapter = ListAdapterProduct(products)
 
@@ -194,7 +194,7 @@ class HomeFragment : Fragment() {
 //        getDataMarketUpdate(marketupdates)
 
         recycleView_MU.layoutManager = LinearLayoutManager(context)
-        var row2 = Realm.getDefaultInstance().where<tMarketUpdate>().findAll()
+        var row2 = realm?.where<tMarketUpdate>()?.findAll()
         marketupdates.addAll(Realm.getDefaultInstance().copyFromRealm(row2))
         recycleView_MU.adapter = ListAdapter_MU(marketupdates)
 
