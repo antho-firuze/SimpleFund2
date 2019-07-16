@@ -6,9 +6,11 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import com.example.simplefund2.model.tPorfolio
 import com.example.simplefund2.product.ProductEfekFragment
 import com.example.simplefund2.product.ProductInfoFragment
 import com.example.simplefund2.product.ProductPerformanceFragment
+import io.realm.kotlin.where
 import kotlinx.android.synthetic.main.activity_product_profile.*
 
 class ProductProfileActivity : AppCompatActivity() {
@@ -52,9 +54,11 @@ class ProductProfileActivity : AppCompatActivity() {
     }
 
     fun getIncomingIntent() {
-        tv_name.text = pubVar.get("PortfolioName")?.toString()
-        tv_type.text = pubVar.get("AssetTypeDescription")?.toString()
-        tv_risk.text = pubVar.get("RiskTolerance")?.toString()
+        var row = realm?.where<tPorfolio>()?.equalTo("PortfolioID", pubVar?.get("PortfolioID") as Int)?.findFirst()
+
+        tv_name.text = row?.PortfolioNameShort      // pubVar.get("PortfolioName")?.toString()
+        tv_type.text = row?.AssetTypeDescription    // pubVar.get("AssetTypeDescription")?.toString()
+        tv_risk.text = row?.RiskTolerance           // pubVar.get("RiskTolerance")?.toString()
 
 //        if (intent.hasExtra("PortfolioID")) {
 //            PortfolioID = intent.getIntExtra("PortfolioID", 0)

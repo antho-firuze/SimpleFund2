@@ -11,10 +11,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.LinearLayout
-import android.widget.ListAdapter
-import android.widget.Toast
+import android.widget.*
 import com.example.simplefund2.R
 import com.example.simplefund2.model.tPorfolio
 import com.example.simplefund2.model.tPorfolioList
@@ -24,6 +21,7 @@ import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpPost
 import com.google.gson.JsonObject
 import io.realm.Realm
+import io.realm.RealmResults
 import io.realm.kotlin.where
 import kotlinx.android.synthetic.main.activity_product_list.*
 import kotlinx.android.synthetic.main.list_product2.view.*
@@ -32,6 +30,9 @@ import java.text.SimpleDateFormat
 import java.util.ArrayList
 
 class ProductListActivity : AppCompatActivity() {
+
+    var selectedAssetType = "All"
+    var selectedFundType = "All"
 
     // LIST PRODUCT
 //    data class Product(val name: String, val navperunit: String, val r1d: String, val risk: String, val curr: String)
@@ -43,7 +44,7 @@ class ProductListActivity : AppCompatActivity() {
 //        recycleView.adapter = ListAdapter_Product(products)
 //    }
 //    val products: ArrayList<Product> = ArrayList()
-    val products: ArrayList<tPorfolioList> = ArrayList()
+    var products: ArrayList<tPorfolioList> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,17 +55,39 @@ class ProductListActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = ""
 
-        val assetType = listOf("Saham", "Pendapatan Tetap", "Campuran", "Pasar Uang", "Proteksi", "Indeks")
+        val assetType = listOf("All", "Saham", "Pendapatan Tetap", "Campuran", "Pasar Uang", "Proteksi", "Indeks")
         val assetType_adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, assetType)
 //        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, assetType)
 //        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         sp_asset_type.adapter = assetType_adapter
+        sp_asset_type.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
 
-        val fundType = listOf("Syariah", "Konvensional")
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+//                Toast.makeText(parent?.context, parent?.getItemAtPosition(position).toString(), Toast.LENGTH_LONG).show()
+                selectedAssetType = parent?.getItemAtPosition(position).toString()
+                onFilterSelected()
+            }
+        }
+
+        val fundType = listOf("All", "Syariah", "Konvensional")
         val fundType_adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, fundType)
 //        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, assetType)
 //        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         sp_fund_type.adapter = fundType_adapter
+        sp_fund_type.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+//                Toast.makeText(parent?.context, parent?.getItemAtPosition(position).toString(), Toast.LENGTH_LONG).show()
+                selectedFundType = parent?.getItemAtPosition(position).toString()
+                onFilterSelected()
+            }
+        }
 
         recycleView.layoutManager = LinearLayoutManager(this)
         var rows = Realm.getDefaultInstance().where<tPorfolioList>().findAll()
@@ -76,6 +99,35 @@ class ProductListActivity : AppCompatActivity() {
         }
 //        getDataProduct(products)
 
+    }
+
+    private fun onFilterSelected() {
+        var rows : RealmResults<tPorfolioList>? = null
+        var query = realm?.where<tPorfolioList>()
+
+        if (selectedAssetType != "All") {
+            when(selectedAssetType){
+                "Saham" -> query?.equalTo("AssetTypeCode", "EQ")
+                "Pendapatan Tetap" -> query?.equalTo("AssetTypeCode", "FI")
+                "Campuran" -> query?.equalTo("AssetTypeCode", "MIX")
+                "Pasar Uang" -> query?.equalTo("AssetTypeCode", "MM")
+                "Proteksi" -> query?.equalTo("AssetTypeCode", "CPF")
+                "Indeks" -> query?.equalTo("AssetTypeCode", "EQ")
+            }
+        }
+        if (selectedFundType != "All") {
+
+            if (selectedFundType == "Syariah")
+                query?.equalTo("IsSyariah", "Y")
+            else
+                query?.equalTo("IsSyariah", "N")
+        }
+
+        rows = query?.findAll()!!
+
+        products = ArrayList()
+        products.addAll(Realm.getDefaultInstance().copyFromRealm(rows))
+        recycleView.adapter = ListAdapterProduct(products)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -133,35 +185,10 @@ class ProductListActivity : AppCompatActivity() {
                 tv_r1d.text = "(${PercentFmt.format(r.rYTD)})"
 
                 tv_name.setOnClickListener {
-                    pubVar = mapOf(
-                        "PortfolioID" to r.PortfolioID,
-                        "PortfolioName" to r.PortfolioNameShort,
-                        "AssetTypeDescription" to r.AssetTypeDescription,
-                        "RiskTolerance" to r.RiskTolerance,
-                        "NAVperUnit" to r.NAVperUnit
-                    )
+                    pubVar = mapOf("PortfolioID" to r.PortfolioID, "NAVperUnit" to r.NAVperUnit)
 
 //                    Toast.makeText(it.context, it.tv_name.text, Toast.LENGTH_LONG).show()
                     val intent = Intent(it.context, ProductProfileActivity::class.java)
-//                    intent.putExtra("img_url", BASE_URL_PORTFOLIO+"${row.PortfolioCode.toUpperCase()}.png")
-//                    intent.putExtra("PortfolioID", r.PortfolioID)
-//                    intent.putExtra("PortfolioName", r.PortfolioNameShort.toUpperCase())
-//                    intent.putExtra("PortfolioName", r.PortfolioNameShort)
-//                    intent.putExtra("AssetTypeDescription", r.AssetTypeDescription)
-//                    intent.putExtra("RiskTolerance", r.RiskTolerance)
-//                    intent.putExtra("InvestmentObjective", r.InvestmentObjective)
-//                    intent.putExtra("CustodianBank", r.CustodianBank)
-//                    intent.putExtra("PositionDate", FormDateFmt.format(row.PositionDate))
-//                    intent.putExtra("NAVperUnit", CurrFmt.format(r.NAVperUnit))
-//                    intent.putExtra("r1D", PercentFmt.format(row.r1D).replace(" ", ""))
-//                    intent.putExtra("rMTD", PercentFmt.format(row.rMTD).replace(" ", ""))
-//                    intent.putExtra("rYTD", PercentFmt.format(row.rYTD).replace(" ", ""))
-//                    intent.putExtra("r1Mo", PercentFmt.format(row.r1Mo).replace(" ", ""))
-//                    intent.putExtra("r3Mo", PercentFmt.format(row.r3Mo).replace(" ", ""))
-//                    intent.putExtra("r6Mo", PercentFmt.format(row.r6Mo).replace(" ", ""))
-//                    intent.putExtra("r1Y", PercentFmt.format(row.r1Y).replace(" ", ""))
-//                    intent.putExtra("r2Y", PercentFmt.format(row.r2Y).replace(" ", ""))
-//                    intent.putExtra("r5Y", PercentFmt.format(row.r5Y).replace(" ", ""))
                     it.context.startActivity(intent)
                 }
             }

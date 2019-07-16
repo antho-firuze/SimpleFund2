@@ -331,23 +331,11 @@ class HomeFragment : Fragment() {
                     tv_r1d.text = PercentFmt.format(r.rYTD)
 
                     tv_name.setOnClickListener {
-                        Toast.makeText(it.context, it.tv_name.text, Toast.LENGTH_LONG).show()
+                        pubVar = mapOf("PortfolioID" to r.PortfolioID, "NAVperUnit" to r.NAVperUnit)
+
+//                        Toast.makeText(it.context, it.tv_name.text, Toast.LENGTH_LONG).show()
                         val intent = Intent(it.context, ProductProfileActivity::class.java)
-//                        val intent = Intent(it.context, PerformanceChartActivity::class.java)
-//                        intent.putExtra("img_url", BASE_URL_PORTFOLIO+"${row.PortfolioCode.toUpperCase()}.png")
-//                        intent.putExtra("PortfolioID", row.PortfolioID)
-//                        intent.putExtra("PortfolioName", row.PortfolioNameFull.toUpperCase())
-//                        intent.putExtra("PositionDate", FormDateFmt.format(row.PositionDate))
-//                        intent.putExtra("NAVperUnit", CurrFmt.format(row.NAVperUnit))
-//                        intent.putExtra("r1D", PercentFmt.format(row.r1D).replace(" ", ""))
-//                        intent.putExtra("rMTD", PercentFmt.format(row.rMTD).replace(" ", ""))
-//                        intent.putExtra("rYTD", PercentFmt.format(row.rYTD).replace(" ", ""))
-//                        intent.putExtra("r1Mo", PercentFmt.format(row.r1Mo).replace(" ", ""))
-//                        intent.putExtra("r3Mo", PercentFmt.format(row.r3Mo).replace(" ", ""))
-//                        intent.putExtra("r6Mo", PercentFmt.format(row.r6Mo).replace(" ", ""))
-//                        intent.putExtra("r1Y", PercentFmt.format(row.r1Y).replace(" ", ""))
-//                        intent.putExtra("r2Y", PercentFmt.format(row.r2Y).replace(" ", ""))
-//                        intent.putExtra("r5Y", PercentFmt.format(row.r5Y).replace(" ", ""))
+
                         it.context.startActivity(intent)
                     }
                 }

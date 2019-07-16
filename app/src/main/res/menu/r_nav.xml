@@ -27,10 +27,5 @@
             android:icon="@drawable/ic_person_black_24dp"
             android:title="Keluar"
             app:showAsAction="never"/>
-    <item
-            android:id="@+id/opt_refresh"
-            android:icon="@drawable/ic_person_black_24dp"
-            android:title="Refresh"
-            app:showAsAction="never"/>
 
 </menu>
